@@ -1,8 +1,6 @@
 package com.example.demo.models;
 
-
 import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,12 +13,14 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producto {
-    private Long id;
-    private String codigoBarras;
-    private String nombre;
-    private String unidadMedida;
-    private BigDecimal precio;
-    private int stock;
+public class DetalleVenta {
+
+    private Venta venta;
+    private Producto producto;
+    private int cantidad;
+
+    public BigDecimal obtenerSubtotal() {
+        return producto.getPrecio().multiply(new BigDecimal(cantidad));
+    }
 
 }
