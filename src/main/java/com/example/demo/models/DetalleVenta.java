@@ -1,6 +1,8 @@
 package com.example.demo.models;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +17,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class DetalleVenta {
 
+    @ManyToOne
+    @JoinColumn(name = "venta_id")
     private Venta venta;
+
+    @ManyToOne
+    @JoinColumn(name = "producto_id")
     private Producto producto;
     private int cantidad;
 
