@@ -1,40 +1,57 @@
 package com.example.demo.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "ventas")
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Venta {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cliente_id", nullable = false)
     private Cliente cliente;
 
-    private List<DetalleVenta> listaProductos;
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<DetalleVenta> detalles = new ArrayList<>();
 
-    private LocalDate fecha;
-    private LocalTime hora;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal total;
 
-    public BigDecimal obtenerPrecioTotal(){
-        BigDecimal suma = new BigDecimal(0);
+    @Column(nullable = false)
+    private LocalDateTime fechaHora;
 
-        for(DetalleVenta dv : listaProductos){
-            suma = suma.add(dv.obtenerSubtotal());
+    @PrePersist
+    public void prePersist() {
+        if (this.fechaHora == null) {
+            this.fechaHora = LocalDateTime.now();
         }
-
-        return suma;
+    }
+    
+    public BigDecimal calcularTotal() {
+        BigDecimal suma = BigDecimal.ZERO;
+        if (detalles != null) {
+            for (DetalleVenta dv : detalles) {
+                if (dv.getSubtotal() != null) {
+                    suma = suma.add(dv.getSubtotal());
+                }
+            }
+        }
+        this.total = suma;
+        return this.total;
     }
 }

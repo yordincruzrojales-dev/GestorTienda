@@ -1,33 +1,44 @@
 package com.example.demo.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.sql.results.graph.Fetch;
 
 import java.math.BigDecimal;
 
 @Entity
-@Getter
-@Setter
+@Table(name = "detalle_venta")
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class DetalleVenta {
 
-    @ManyToOne
-    @JoinColumn(name = "venta_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "venta_id", nullable = false)
     private Venta venta;
 
-    @ManyToOne
-    @JoinColumn(name = "producto_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "producto_id", nullable = false)
     private Producto producto;
-    private int cantidad;
 
-    public BigDecimal obtenerSubtotal() {
-        return producto.getPrecio().multiply(new BigDecimal(cantidad));
+    @Column(nullable = false)
+    private Integer cantidad;
+
+    @Column(name = "precio_unitaro", nullable = false, precision = 10, scale = 2)
+    private BigDecimal precioUnitario;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal subtotal;
+
+    public BigDecimal calcularSubtotal() {
+        if (this.precioUnitario != null && this.cantidad != null) {
+            this.subtotal = this.precioUnitario.multiply(BigDecimal.valueOf(this.cantidad));
+        }
+        return this.subtotal;
     }
-
 }
