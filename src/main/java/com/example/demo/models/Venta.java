@@ -41,7 +41,7 @@ public class Venta {
             this.fechaHora = LocalDateTime.now();
         }
     }
-    
+
     public BigDecimal calcularTotal() {
         BigDecimal suma = BigDecimal.ZERO;
         if (detalles != null) {
