@@ -41,16 +41,21 @@ public class ClienteService {
     }
 
     @Transactional
-    public Cliente actualizarCliente(Cliente cliente){
+    public Cliente actualizarCliente(Long id, Cliente cliente){
 
-        Cliente clienteExistente = buscarPorId(cliente.getId());
+        Cliente clienteExistente = buscarPorId(id);
 
         if (!clienteExistente.getDni().equals(cliente.getDni())
                 && clienteRepository.existsByDni(cliente.getDni())) {
             throw new IllegalArgumentException("El nuevo DNI ya se encuentra registrado por otro cliente.");
         }
 
-        return clienteRepository.save(cliente);
+        clienteExistente.setDni(cliente.getDni());
+        clienteExistente.setNombres(cliente.getNombres());
+        clienteExistente.setApellidos(cliente.getApellidos());
+        clienteExistente.setTelefono(cliente.getTelefono());
+
+        return clienteRepository.save(clienteExistente);
     }
 
     @Transactional
