@@ -12,8 +12,6 @@ import java.util.List;
 @Repository
 public interface VentaRepository extends JpaRepository<Venta, Long> {
 
-    List<Venta> findByCliente(Cliente cliente);
-
     List<Venta> findByClienteId(Long clienteId);
 
     List<Venta> findByTotalLessThanEqual(BigDecimal total);
