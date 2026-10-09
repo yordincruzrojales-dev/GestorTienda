@@ -52,12 +52,23 @@ public class ClienteService {
             throw new IllegalArgumentException("El nuevo DNI ya se encuentra registrado por otro cliente.");
         }
 
-        clienteExistente.setDni(cliente.getDni());
-        clienteExistente.setNombres(cliente.getNombres());
-        clienteExistente.setApellidos(cliente.getApellidos());
-        clienteExistente.setTelefono(cliente.getTelefono());
+        if (cliente.getDni() != null){
+            clienteExistente.setDni(cliente.getDni());
+        }
 
-        if(cliente.getActivo() != null) {
+        if (cliente.getNombres() != null){
+            clienteExistente.setNombres(cliente.getNombres());
+        }
+
+        if (cliente.getApellidos() != null){
+            clienteExistente.setApellidos(cliente.getApellidos());
+        }
+
+        if (cliente.getTelefono() != null){
+            clienteExistente.setTelefono(cliente.getTelefono());
+        }
+
+        if (cliente.getActivo() != null){
             clienteExistente.setActivo(cliente.getActivo());
         }
 
@@ -72,6 +83,19 @@ public class ClienteService {
 
         Cliente cliente = buscarPorId(id);
         cliente.setActivo(false);
+
+        clienteRepository.save(cliente);
+    }
+
+    @Transactional
+    public void reactivarCliente(Long id){
+        if (!clienteRepository.existsByIdAndActivoFalse(id)){
+            throw new RuntimeException("No se puede reactivar, ya que no existe o ya estra activo");
+        }
+
+        Cliente cliente = clienteRepository.findByIdAndActivoFalse(id)
+                .orElseThrow(() -> new RuntimeException("No se puede reactivar, ya que no existe o ya estra activo"));
+        cliente.setActivo(true);
 
         clienteRepository.save(cliente);
     }
