@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -64,10 +65,25 @@ public class ProductoService {
             throw new IllegalArgumentException("El código de barras " + producto.getCodigoBarras() + " está registrado en otro producto");
         }
 
-        productoExistente.setNombre(producto.getNombre());
-        productoExistente.setPrecio(producto.getPrecio());
-        productoExistente.setStock(producto.getStock());
-        productoExistente.setCodigoBarras(producto.getCodigoBarras());
+        if (producto.getCodigoBarras() != null){
+            productoExistente.setCodigoBarras(producto.getCodigoBarras());
+        }
+
+        if (producto.getNombre() != null){
+            productoExistente.setNombre(producto.getNombre());
+        }
+
+        if (producto.getUnidadMedida() != null){
+            productoExistente.setUnidadMedida(producto.getUnidadMedida());
+        }
+
+        if (producto.getPrecio() != null){
+            productoExistente.setPrecio(producto.getPrecio());
+        }
+
+        if (producto.getStock() != null && producto.getStock() >= 0){
+            productoExistente.setStock(producto.getStock());
+        }
 
         return productoRepository.save(productoExistente);
     }
