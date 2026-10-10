@@ -48,7 +48,7 @@ public class ProductoController {
         return ResponseEntity.ok(productoService.listarMenorIgualStock(stock));
     }
 
-    @GetMapping("/buscar")
+    @GetMapping("/buscar-nombre")
     public ResponseEntity<List<Producto>> buscarPorNombre(@RequestParam String nombre){
         return ResponseEntity.ok(productoService.listarPorNombre(nombre));
     }
@@ -56,5 +56,17 @@ public class ProductoController {
     @PutMapping("/{id}")
     public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto){
         return ResponseEntity.ok(productoService.actualizarProducto(id, producto));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> desactivarProducto(@PathVariable Long id){
+        productoService.desactivarProducto(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/activar")
+    public ResponseEntity<Void> reactivarProducto(@PathVariable Long id){
+        productoService.reactivarProducto(id);
+        return ResponseEntity.noContent().build();
     }
 }
