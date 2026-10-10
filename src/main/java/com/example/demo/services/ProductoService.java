@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -16,7 +17,7 @@ public class ProductoService {
 
     @Transactional
     public Producto registrarProducto(Producto producto) {
-        if (productoRepository.existsByCodigoBarras(producto.getCodigoBarras())) {
+        if (productoRepository.existsByCodigoBarrasAndActivoTrue(producto.getCodigoBarras())) {
             throw new IllegalArgumentException("Ya existe un producto con el código de barras: " + producto.getCodigoBarras());
         }
 
@@ -25,34 +26,39 @@ public class ProductoService {
 
     @Transactional(readOnly = true)
     public Producto buscarPorId(Long id) {
-        return productoRepository.findById(id)
+        return productoRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con el ID: " + id));
     }
 
     @Transactional(readOnly = true)
     public Producto buscarPorCodigoBarras(String codigo) {
-        return productoRepository.findByCodigoBarras(codigo)
+        return productoRepository.findByCodigoBarrasAndActivoTrue(codigo)
                 .orElseThrow(() -> new RuntimeException("Producto no encontrado con el código de barras: " + codigo));
     }
 
     @Transactional(readOnly = true)
     public List<Producto> listarProductos() {
-        return productoRepository.findAll();
+        return productoRepository.findByActivoTrue();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Producto> listarProductosInactivos() {
+        return productoRepository.findByActivoFalse();
     }
 
     @Transactional(readOnly = true)
     public List<Producto> listarMenorIgualStock(Integer stock) {
-        return productoRepository.findByStockLessThanEqual(stock);
+        return productoRepository.findByStockLessThanEqualAndActivoTrue(stock);
     }
 
     @Transactional(readOnly = true)
     public List<Producto> listarMayorStock(Integer stock) {
-        return productoRepository.findByStockGreaterThan(stock);
+        return productoRepository.findByStockGreaterThanAndActivoTrue(stock);
     }
 
     @Transactional(readOnly = true)
     public List<Producto> listarPorNombre(String nombre) {
-        return productoRepository.findByNombreContainingIgnoreCase(nombre);
+        return productoRepository.findByNombreContainingIgnoreCaseAndActivoTrue(nombre);
     }
 
     @Transactional
@@ -60,24 +66,50 @@ public class ProductoService {
         Producto productoExistente = buscarPorId(id);
 
         if (!productoExistente.getCodigoBarras().equals(producto.getCodigoBarras())
-                && productoRepository.existsByCodigoBarras(producto.getCodigoBarras())) {
+                && productoRepository.existsByCodigoBarrasAndActivoTrue(producto.getCodigoBarras())) {
             throw new IllegalArgumentException("El código de barras " + producto.getCodigoBarras() + " está registrado en otro producto");
         }
 
-        productoExistente.setNombre(producto.getNombre());
-        productoExistente.setPrecio(producto.getPrecio());
-        productoExistente.setStock(producto.getStock());
-        productoExistente.setCodigoBarras(producto.getCodigoBarras());
+        if (producto.getCodigoBarras() != null){
+            productoExistente.setCodigoBarras(producto.getCodigoBarras());
+        }
+
+        if (producto.getNombre() != null){
+            productoExistente.setNombre(producto.getNombre());
+        }
+
+        if (producto.getUnidadMedida() != null){
+            productoExistente.setUnidadMedida(producto.getUnidadMedida());
+        }
+
+        if (producto.getPrecio() != null){
+            productoExistente.setPrecio(producto.getPrecio());
+        }
+
+        if (producto.getStock() != null && producto.getStock() >= 0){
+            productoExistente.setStock(producto.getStock());
+        }
 
         return productoRepository.save(productoExistente);
     }
 
     @Transactional
-    public void eliminar(Long id) {
-        if (!productoRepository.existsById(id)) {
-            throw new RuntimeException("No se puede eliminar. El producto con ID " + id + " no existe");
-        }
+    public void desactivarProducto(Long id){
+        Producto producto = productoRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new RuntimeException("El producto no existe o no esta actio"));
 
-        productoRepository.deleteById(id);
+        producto.setActivo(false);
+
+        productoRepository.save(producto);
+    }
+
+    @Transactional
+    public void reactivarProducto(Long id){
+        Producto producto = productoRepository.findByIdAndActivoFalse(id)
+                .orElseThrow(() -> new RuntimeException("El producto no existe o no esta desactivado"));
+
+        producto.setActivo(true);
+
+        productoRepository.save(producto);
     }
 }

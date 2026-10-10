@@ -10,13 +10,20 @@ import java.util.Optional;
 @Repository
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
-    boolean existsByCodigoBarras(String codigoBarras);
+    boolean existsByIdAndActivoTrue(Long id);
+    boolean existsByCodigoBarrasAndActivoTrue(String codigoBarras);
+    boolean existsByIdAndActivoFalse(Long id);
 
-    Optional<Producto> findByCodigoBarras(String codigoBarras);
+    Optional<Producto> findByIdAndActivoTrue(Long id);
+    Optional<Producto> findByIdAndActivoFalse(Long id);
+    Optional<Producto> findByCodigoBarrasAndActivoTrue(String codigoBarras);
 
-    List<Producto> findByStockLessThanEqual(Integer stock);
+    List<Producto> findByActivoTrue();
+    List<Producto> findByActivoFalse();
 
-    List<Producto> findByStockGreaterThan(Integer stock);
+    List<Producto> findByStockLessThanEqualAndActivoTrue(Integer stock);
 
-    List<Producto> findByNombreContainingIgnoreCase(String nombre);
+    List<Producto> findByStockGreaterThanAndActivoTrue(Integer stock);
+
+    List<Producto> findByNombreContainingIgnoreCaseAndActivoTrue(String nombre);
 }

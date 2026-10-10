@@ -13,10 +13,13 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     boolean existsByDniAndActivoTrue(String dni);
     boolean existsByIdAndActivoTrue(Long id);
 
+    boolean existsByIdAndActivoFalse(Long id);
+
     List<Cliente> findByActivoTrue();
     List<Cliente> findByActivoFalse();
 
     Optional<Cliente> findByDniAndActivoTrue(String dni);
     Optional<Cliente> findByIdAndActivoTrue(Long id);
+    Optional<Cliente> findByIdAndActivoFalse(Long id);
 
 }

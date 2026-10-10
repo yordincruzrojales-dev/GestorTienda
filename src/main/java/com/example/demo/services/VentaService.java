@@ -22,9 +22,9 @@ public class VentaService {
     private final ProductoService productoService;
 
     @Transactional
-    public Venta regitrarVenta(Venta venta){
+    public Venta registrarVenta(Venta venta){
 
-        Cliente cliente = clienteService.buscarPorDni(venta.getCliente().getDni());
+        Cliente cliente = clienteService.buscarPorId(venta.getCliente().getId());
         venta.setCliente(cliente);
 
         List<DetalleVenta> listaDetalleVenta = venta.getDetalles();
@@ -32,7 +32,6 @@ public class VentaService {
         if (listaDetalleVenta == null || listaDetalleVenta.isEmpty()){
             throw new IllegalArgumentException("La venta denbe contener al menos un detalle de producto");
         }
-
 
         for (DetalleVenta dv : listaDetalleVenta){
             Producto producto = productoService.buscarPorId(dv.getProducto().getId());
@@ -60,6 +59,11 @@ public class VentaService {
     public Venta buscarPorId(Long id){
         return ventaRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Venta no encontrado por el ID: " + id));
+    }
+
+    @Transactional(readOnly = true)
+    public List<Venta> listarVentas(){
+        return ventaRepository.findAll();
     }
 
     @Transactional(readOnly = true)
