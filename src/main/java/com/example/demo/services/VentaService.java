@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.exceptions.StockInsuficienteException;
 import com.example.demo.models.Cliente;
 import com.example.demo.models.DetalleVenta;
 import com.example.demo.models.Producto;
@@ -37,7 +39,7 @@ public class VentaService {
             Producto producto = productoService.buscarPorId(dv.getProducto().getId());
 
             if (producto.getStock() < dv.getCantidad()){
-                throw new IllegalArgumentException("Stock insuficiente para el producto: " + producto.getNombre());
+                throw new StockInsuficienteException("Stock insuficiente para el producto: " + producto.getNombre());
             }
 
             producto.setStock(producto.getStock() - dv.getCantidad());
@@ -58,7 +60,7 @@ public class VentaService {
     @Transactional(readOnly = true)
     public Venta buscarPorId(Long id){
         return ventaRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Venta no encontrado por el ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Venta no encontrado por el ID: " + id));
     }
 
     @Transactional(readOnly = true)

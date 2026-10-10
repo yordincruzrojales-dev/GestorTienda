@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.DuplicateResourceException;
+import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.models.Cliente;
 import com.example.demo.repositories.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +21,7 @@ public class ClienteService {
         cliente.setActivo(true);
 
         if (clienteRepository.existsByDniAndActivoTrue(cliente.getDni())){
-            throw new IllegalArgumentException("Ya existe un cliente registrado con dni: " + cliente.getDni());
+            throw new DuplicateResourceException("Ya existe un cliente registrado con dni: " + cliente.getDni());
         }
 
         return clienteRepository.save(cliente);
@@ -28,13 +30,13 @@ public class ClienteService {
     @Transactional(readOnly = true)
     public Cliente buscarPorDni(String dni){
         return clienteRepository.findByDniAndActivoTrue(dni)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con dni: " + dni));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con dni: " + dni));
     }
 
     @Transactional(readOnly = true)
     public Cliente buscarPorId(Long id){
         return clienteRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con Id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con Id: " + id));
     }
 
     @Transactional(readOnly = true)
@@ -49,7 +51,7 @@ public class ClienteService {
 
         if (!clienteExistente.getDni().equals(cliente.getDni())
                 && clienteRepository.existsByDniAndActivoTrue(cliente.getDni())) {
-            throw new IllegalArgumentException("El nuevo DNI ya se encuentra registrado por otro cliente.");
+            throw new DuplicateResourceException("El nuevo DNI ya se encuentra registrado por otro cliente.");
         }
 
         if (cliente.getDni() != null){
@@ -78,7 +80,7 @@ public class ClienteService {
     @Transactional
     public void desactivarCliente(Long id){
         if (!clienteRepository.existsByIdAndActivoTrue(id)) {
-            throw new RuntimeException("No se puede eliminar. El cliente con ID " + id + " no existe");
+            throw new ResourceNotFoundException("No se puede Desactivar. El cliente con ID " + id + " no existe");
         }
 
         Cliente cliente = buscarPorId(id);
@@ -89,12 +91,8 @@ public class ClienteService {
 
     @Transactional
     public void reactivarCliente(Long id){
-        if (!clienteRepository.existsByIdAndActivoFalse(id)){
-            throw new RuntimeException("No se puede reactivar, ya que no existe o ya estra activo");
-        }
-
         Cliente cliente = clienteRepository.findByIdAndActivoFalse(id)
-                .orElseThrow(() -> new RuntimeException("No se puede reactivar, ya que no existe o ya estra activo"));
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede reactivar, ya que no existe o ya estra activo"));
         cliente.setActivo(true);
 
         clienteRepository.save(cliente);

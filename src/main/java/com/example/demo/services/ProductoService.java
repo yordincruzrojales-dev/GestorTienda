@@ -1,5 +1,7 @@
 package com.example.demo.services;
 
+import com.example.demo.exceptions.DuplicateResourceException;
+import com.example.demo.exceptions.ResourceNotFoundException;
 import com.example.demo.models.Producto;
 import com.example.demo.repositories.ProductoRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +20,7 @@ public class ProductoService {
     @Transactional
     public Producto registrarProducto(Producto producto) {
         if (productoRepository.existsByCodigoBarrasAndActivoTrue(producto.getCodigoBarras())) {
-            throw new IllegalArgumentException("Ya existe un producto con el código de barras: " + producto.getCodigoBarras());
+            throw new DuplicateResourceException("Ya existe un producto con el código de barras: " + producto.getCodigoBarras());
         }
 
         return productoRepository.save(producto);
@@ -27,13 +29,13 @@ public class ProductoService {
     @Transactional(readOnly = true)
     public Producto buscarPorId(Long id) {
         return productoRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con el ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el ID: " + id));
     }
 
     @Transactional(readOnly = true)
     public Producto buscarPorCodigoBarras(String codigo) {
         return productoRepository.findByCodigoBarrasAndActivoTrue(codigo)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado con el código de barras: " + codigo));
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con el código de barras: " + codigo));
     }
 
     @Transactional(readOnly = true)
@@ -67,7 +69,7 @@ public class ProductoService {
 
         if (!productoExistente.getCodigoBarras().equals(producto.getCodigoBarras())
                 && productoRepository.existsByCodigoBarrasAndActivoTrue(producto.getCodigoBarras())) {
-            throw new IllegalArgumentException("El código de barras " + producto.getCodigoBarras() + " está registrado en otro producto");
+            throw new DuplicateResourceException("El código de barras " + producto.getCodigoBarras() + " está registrado en otro producto");
         }
 
         if (producto.getCodigoBarras() != null){
@@ -96,7 +98,7 @@ public class ProductoService {
     @Transactional
     public void desactivarProducto(Long id){
         Producto producto = productoRepository.findByIdAndActivoTrue(id)
-                .orElseThrow(() -> new RuntimeException("El producto no existe o no esta actio"));
+                .orElseThrow(() -> new ResourceNotFoundException("El producto no existe o no esta actio"));
 
         producto.setActivo(false);
 
@@ -106,7 +108,7 @@ public class ProductoService {
     @Transactional
     public void reactivarProducto(Long id){
         Producto producto = productoRepository.findByIdAndActivoFalse(id)
-                .orElseThrow(() -> new RuntimeException("El producto no existe o no esta desactivado"));
+                .orElseThrow(() -> new ResourceNotFoundException("El producto no existe o no esta desactivado"));
 
         producto.setActivo(true);
 
