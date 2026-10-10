@@ -33,5 +33,5 @@ public class Producto {
     private Integer stock;
 
     @Column(nullable = false)
-    private boolean activo;
+    private Boolean activo;
 }
