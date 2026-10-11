@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Cliente;
 import com.example.demo.services.ClienteService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class ClienteController {
     private final ClienteService clienteService;
 
     @PostMapping
-    public ResponseEntity<Cliente> registrarCliente(@RequestBody Cliente cliente){
+    public ResponseEntity<Cliente> registrarCliente(@Valid @RequestBody Cliente cliente){
         Cliente nuevoCliente = clienteService.registrarCliente(cliente);
         return new ResponseEntity<>(nuevoCliente, HttpStatus.CREATED);
     }
@@ -42,7 +43,7 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @RequestBody Cliente cliente){
+    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @Valid @RequestBody Cliente cliente){
         Cliente clienteModificado = clienteService.actualizarCliente(id, cliente);
         return ResponseEntity.ok(clienteModificado);
     }

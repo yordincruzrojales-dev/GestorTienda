@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Venta;
 import com.example.demo.services.VentaService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -20,7 +21,7 @@ public class VentaController {
     private final VentaService ventaService;
 
     @PostMapping
-    public ResponseEntity<Venta> registrarVenta(@RequestBody Venta venta){
+    public ResponseEntity<Venta> registrarVenta(@Valid @RequestBody Venta venta){
         Venta ventaNueva = ventaService.registrarVenta(venta);
         return new ResponseEntity<>(ventaNueva, HttpStatus.CREATED);
     }
