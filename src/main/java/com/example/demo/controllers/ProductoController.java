@@ -2,6 +2,7 @@ package com.example.demo.controllers;
 
 import com.example.demo.models.Producto;
 import com.example.demo.services.ProductoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ public class ProductoController {
     private final ProductoService productoService;
 
     @PostMapping
-    public ResponseEntity<Producto> registrarProducto(@RequestBody Producto producto){
+    public ResponseEntity<Producto> registrarProducto(@Valid @RequestBody Producto producto){
         Producto productoRegistrado = productoService.registrarProducto(producto);
 
         return new ResponseEntity<>(productoRegistrado, HttpStatus.CREATED);
@@ -54,7 +55,7 @@ public class ProductoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id, @RequestBody Producto producto){
+    public ResponseEntity<Producto> actualizarProducto(@PathVariable Long id,@Valid @RequestBody Producto producto){
         return ResponseEntity.ok(productoService.actualizarProducto(id, producto));
     }
 
