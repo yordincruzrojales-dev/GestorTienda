@@ -34,7 +34,8 @@ public class Producto {
     private String unidadMedida;
 
     @NotNull(message = "El precio es obligatorio")
-    @DecimalMin(value = "0.01", message = "Minimo es s/. 0.01")
+    @DecimalMin(value = "0.01", message = "El precio mínimo es S/. 0.01")
+    @Digits(integer = 8, fraction = 2, message = "El precio debe tener máximo 8 enteros y 2 decimales")
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal precio;
 
