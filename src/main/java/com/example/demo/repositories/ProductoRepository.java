@@ -1,6 +1,7 @@
 package com.example.demo.repositories;
 
 import com.example.demo.models.Producto;
+import lombok.extern.java.Log;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,14 +13,17 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     boolean existsByIdAndActivoTrue(Long id);
     boolean existsByCodigoBarrasAndActivoTrue(String codigoBarras);
+    boolean existsByCodigoBarras(String codigoBarras);
     boolean existsByIdAndActivoFalse(Long id);
 
     Optional<Producto> findByIdAndActivoTrue(Long id);
     Optional<Producto> findByIdAndActivoFalse(Long id);
     Optional<Producto> findByCodigoBarrasAndActivoTrue(String codigoBarras);
 
+
     List<Producto> findByActivoTrue();
     List<Producto> findByActivoFalse();
+    List<Producto> findByIdInAndActivoTrue(List<Long> ids);
 
     List<Producto> findByStockLessThanEqualAndActivoTrue(Integer stock);
 

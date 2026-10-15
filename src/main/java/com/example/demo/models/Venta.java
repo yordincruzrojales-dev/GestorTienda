@@ -3,15 +3,11 @@ package com.example.demo.models;
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class Venta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -41,7 +38,7 @@ public class Venta {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal total;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_hora", nullable = false)
     private LocalDateTime fechaHora;
 
     @PrePersist
@@ -50,7 +47,6 @@ public class Venta {
         if (this.fechaHora == null) {
             this.fechaHora = LocalDateTime.now();
         }
-
         calcularTotal();
     }
 
@@ -59,7 +55,7 @@ public class Venta {
         if (detalles != null) {
             for (DetalleVenta dv : detalles) {
                 dv.calcularSubtotal();
-                if (dv.getSubtotal() != null){
+                if (dv.getSubtotal() != null) {
                     suma = suma.add(dv.getSubtotal());
                 }
             }

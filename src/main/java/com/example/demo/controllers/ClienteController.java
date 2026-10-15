@@ -1,6 +1,7 @@
 package com.example.demo.controllers;
 
-import com.example.demo.models.Cliente;
+import com.example.demo.dtos.cliente.ClienteRequestDTO;
+import com.example.demo.dtos.cliente.ClienteResponseDTO;
 import com.example.demo.services.ClienteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -8,43 +9,42 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.smartcardio.ResponseAPDU;
 import java.util.List;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/api/v1/clientes")
 @RequiredArgsConstructor
 public class ClienteController {
 
     private final ClienteService clienteService;
 
     @PostMapping
-    public ResponseEntity<Cliente> registrarCliente(@Valid @RequestBody Cliente cliente){
-        Cliente nuevoCliente = clienteService.registrarCliente(cliente);
+    public ResponseEntity<ClienteResponseDTO> registrarCliente(@Valid @RequestBody ClienteRequestDTO clienteRequestDTO){
+        ClienteResponseDTO nuevoCliente = clienteService.registrarCliente(clienteRequestDTO);
         return new ResponseEntity<>(nuevoCliente, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<Cliente>> listarClientes(){
-        List<Cliente> clientes = clienteService.listarClientes();
+    public ResponseEntity<List<ClienteResponseDTO>> listarClientes(){
+        List<ClienteResponseDTO> clientes = clienteService.listarClientes();
         return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Cliente> buscarCliente(@PathVariable Long id){
-        Cliente cliente = clienteService.buscarPorId(id);
+    public ResponseEntity<ClienteResponseDTO> buscarCliente(@PathVariable Long id){
+        ClienteResponseDTO cliente = clienteService.buscarPorIdDTO(id);
         return ResponseEntity.ok(cliente);
     }
 
     @GetMapping("/buscar")
-    public ResponseEntity<Cliente> buscarPorDni(@RequestParam String dni){
-        Cliente cliente = clienteService.buscarPorDni(dni);
+    public ResponseEntity<ClienteResponseDTO> buscarPorDni(@RequestParam String dni){
+        ClienteResponseDTO cliente = clienteService.buscarPorDni(dni);
         return ResponseEntity.ok(cliente);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Cliente> actualizarCliente(@PathVariable Long id, @Valid @RequestBody Cliente cliente){
-        Cliente clienteModificado = clienteService.actualizarCliente(id, cliente);
+    public ResponseEntity<ClienteResponseDTO> actualizarCliente(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO clienteRequestDTO){
+        ClienteResponseDTO clienteModificado = clienteService.actualizarCliente(id, clienteRequestDTO);
         return ResponseEntity.ok(clienteModificado);
     }
 

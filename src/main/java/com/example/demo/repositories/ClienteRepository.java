@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
     boolean existsByDniAndActivoTrue(String dni);
+    boolean existsByDni(String dni);
     boolean existsByIdAndActivoTrue(Long id);
 
     boolean existsByIdAndActivoFalse(Long id);
