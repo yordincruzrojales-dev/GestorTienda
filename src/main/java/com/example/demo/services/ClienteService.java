@@ -1,7 +1,10 @@
 package com.example.demo.services;
 
+import com.example.demo.dtos.cliente.ClienteRequestDTO;
+import com.example.demo.dtos.cliente.ClienteResponseDTO;
 import com.example.demo.exceptions.DuplicateResourceException;
 import com.example.demo.exceptions.ResourceNotFoundException;
+import com.example.demo.mappers.ClienteMapper;
 import com.example.demo.models.Cliente;
 import com.example.demo.repositories.ClienteRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,22 +18,36 @@ import java.util.List;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
+    private final ClienteMapper clienteMapper;
 
     @Transactional
-    public Cliente registrarCliente(Cliente cliente){
-        cliente.setActivo(true);
+    public ClienteResponseDTO registrarCliente(ClienteRequestDTO clienteRequestDTO){
 
-        if (clienteRepository.existsByDniAndActivoTrue(cliente.getDni())){
-            throw new DuplicateResourceException("Ya existe un cliente registrado con dni: " + cliente.getDni());
+        if (clienteRepository.existsByDni(clienteRequestDTO.getDni())){
+            throw new DuplicateResourceException("Ya existe un cliente registrado con dni: " + clienteRequestDTO.getDni());
         }
 
-        return clienteRepository.save(cliente);
+        Cliente clienteNuevo = clienteMapper.toEntity(clienteRequestDTO);
+
+        Cliente clienteGuardado = clienteRepository.save(clienteNuevo);
+
+        return clienteMapper.toResponseDTO(clienteGuardado);
     }
 
     @Transactional(readOnly = true)
-    public Cliente buscarPorDni(String dni){
-        return clienteRepository.findByDniAndActivoTrue(dni)
+    public ClienteResponseDTO buscarPorDni(String dni){
+        Cliente clienteEncontrado = clienteRepository.findByDniAndActivoTrue(dni)
                 .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con dni: " + dni));
+
+        return clienteMapper.toResponseDTO(clienteEncontrado);
+    }
+
+    @Transactional(readOnly = true)
+    public ClienteResponseDTO buscarPorIdDTO(Long id){
+        Cliente clienteEncontrado = clienteRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con Id: " + id));
+
+        return clienteMapper.toResponseDTO(clienteEncontrado);
     }
 
     @Transactional(readOnly = true)
@@ -40,17 +57,18 @@ public class ClienteService {
     }
 
     @Transactional(readOnly = true)
-    public List<Cliente> listarClientes(){
-        return clienteRepository.findByActivoTrue();
+    public List<ClienteResponseDTO> listarClientes(){
+        return clienteRepository.findByActivoTrue()
+                .stream().map(clienteMapper::toResponseDTO).toList();
     }
 
     @Transactional
-    public Cliente actualizarCliente(Long id, Cliente cliente){
+    public ClienteResponseDTO actualizarCliente(Long id, ClienteRequestDTO cliente){
 
         Cliente clienteExistente = buscarPorId(id);
 
         if (!clienteExistente.getDni().equals(cliente.getDni())
-                && clienteRepository.existsByDniAndActivoTrue(cliente.getDni())) {
+                && clienteRepository.existsByDni(cliente.getDni())) {
             throw new DuplicateResourceException("El nuevo DNI ya se encuentra registrado por otro cliente.");
         }
 
@@ -74,7 +92,9 @@ public class ClienteService {
             clienteExistente.setActivo(cliente.getActivo());
         }
 
-        return clienteRepository.save(clienteExistente);
+        Cliente clienteActualizado = clienteRepository.save(clienteExistente);
+
+        return clienteMapper.toResponseDTO(clienteActualizado);
     }
 
     @Transactional
